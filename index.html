@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no" />
+  <title>Saavn Music Player</title>
+  <meta name="description" content="Saavn Music Player is an Ad-Free Music Player, High Quality MP3 Songs with Metadata support, and a Modern Design. A large library of songs. developed by wiz64" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Bitter:400,700" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700" />
+  <link rel="stylesheet" href="https://saavn-web-ui.vercel.app/assets/css/styles.css" />
+</head>
+
+<body style="padding-bottom: 50px; background: #000;">
+  <header class="header-dark" style="color: #cdcdcd; padding: 0 0 10px;">
+    <nav class="navbar navbar-dark navbar-expand-lg navigation-clean-search">
+      <div class="container">
+        <a class="navbar-brand" href="#">Saavn</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navcol-1" aria-controls="navcol-1" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navcol-1">
+          <ul class="navbar-nav ml-auto"></ul>
+        </div>
+      </div>
+    </nav>
+    <div class="container text-center">
+      <h1>Saavn</h1>
+      <h3 style="color: rgba(249, 255, 255, 0.81); font-family: Bitter, serif;">Music Player & Downloader</h3>
+      <p>Ad-Free, Metadata, & Modern Design</p>
+    </div>
+  </header>
+
+  <section class="highlight-clean" style="background: #000; color: #f9f9f9; padding-top: 20px;">
+    <div class="text-center mb-3">
+      <select id="saavn-bitrate" class="form-control w-auto d-inline-block">
+        <option value="4">320kbps</option>
+        <option value="3" selected>160kbps</option>
+        <option value="2">96kbps</option>
+        <option value="1">48kbps</option>
+      </select>
+    </div>
+
+    <div class="container">
+      <form class="text-center" id="search-form">
+        <div class="form-group d-flex justify-content-center align-items-center flex-wrap">
+          <input class="form-control w-75" type="text" id="saavn-search-box" placeholder="Enter Name, Year, Artist" />
+          <button class="btn btn-primary ml-2" id="saavn-search-trigger" type="submit">Search</button>
+        </div>
+        <h5 class="text-uppercase text-center text-success">Results</h5>
+      </form>
+
+      <div id="saavn-results" class="mb-3">
+        <h5>Featured</h5>
+      </div>
+
+      <div class="text-center mb-4">
+        <button id="loadmore" class="btn btn-outline-light w-100">Load More</button>
+      </div>
+
+      <div class="button-container d-flex flex-wrap justify-content-center mb-3"></div>
+
+      <p class="footer text-center text-muted small">
+        This content is not affiliated with or endorsed by any music provider like Gaana, Saavn, Spotify. No music is hosted on our servers.
+      </p>
+    </div>
+  </section>
+
+  <div id="audio-player" class="fixed-bottom bg-dark text-white p-2" style="backdrop-filter: blur(4px); border-top-left-radius: 10px; border-top-right-radius: 10px;">
+    <div class="d-flex align-items-center">
+      <img id="player-image" src="https://i.pinimg.com/originals/ed/54/d2/ed54d2fa700d36d4f2671e1be84651df.jpg" class="img-fluid rounded mr-3" style="height: 75px; width: 75px;" alt="Cover" />
+      <div class="flex-fill">
+        <div id="player-name">Song</div>
+        <div id="player-album">Album</div>
+        <audio id="player" controls controlsList="nodownload" class="w-100 mt-1">
+          <source id="audioSource" src="" />
+          Your browser does not support the audio format.
+        </audio>
+      </div>
+    </div>
+  </div>
+
+  <div class="float-button" style="width: 40px; height: 40px; border-radius: 50%; background-color: #fff; box-shadow: 0 0 10px #000; cursor: pointer; position: fixed; top: 50px; right: 20px; z-index: 9999;">
+    <a href="javascript:void(0);" class="btn p-0" id="mpopupLink" aria-label="Open Downloads">
+      <img src="https://img.icons8.com/ios/50/000000/download.png" alt="Download" style="width: 100%; height: 100%;" />
+    </a>
+  </div>
+
+  <!-- Modal -->
+  <div id="mpopupBox" class="mpopup">
+    <div class="modal-content bg-dark text-white p-3 rounded">
+      <div class="modal-header d-flex justify-content-between">
+        <h2>Downloads</h2>
+        <span class="close" style="cursor: pointer;">×</span>
+      </div>
+      <div class="modal-body">
+        <ul id="download-list" class="list-unstyled"></ul>
+      </div>
+      <div class="modal-footer text-center">
+        <p class="text-muted">Don't flood the media server. Please be patient.</p>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    #saavn-results {
+      display: flex;
+      flex-wrap: wrap;
+    }
+
+    .song-container {
+      margin: 10px;
+    }
+
+    @media (min-width: 992px) {
+      .song-container {
+        width: calc(33.33% - 20px);
+      }
+    }
+
+    @media (min-width: 768px) and (max-width: 991px) {
+      .song-container {
+        width: calc(50% - 20px);
+      }
+    }
+
+    @media (max-width: 767px) {
+      .song-container {
+        width: calc(100% - 20px);
+      }
+    }
+
+    .search-toggle {
+      background: rgba(0, 0, 0, 0.1);
+      color: #fff;
+      font-size: 16px;
+      font-family: Aclonica, sans-serif;
+      padding: 6px 10px;
+      border: none;
+      margin: 5px;
+    }
+
+    .mpopup {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      right: 20px;
+      bottom: 20px;
+      background: rgba(0, 0, 0, 0.7);
+      z-index: 9999;
+      display: none;
+    }
+  </style>
+
+  <script>
+    const buttonTitles = ['2023', 'English Songs', 'Edward Maya', 'Zack Knight', 'Akcent', 'Arijit Singh', 'Enrique Iglesias'];
+    const container = document.querySelector('.button-container');
+
+    buttonTitles.forEach(title => {
+      const btn = document.createElement('button');
+      btn.className = 'search-toggle';
+      btn.textContent = title;
+      btn.onclick = () => doSaavnSearch(title);
+      container.appendChild(btn);
+    });
+
+    // Modal handlers
+    const modal = document.getElementById('mpopupBox');
+    const openModal = document.getElementById('mpopupLink');
+    const closeModal = document.querySelector('.close');
+
+    openModal.onclick = () => modal.style.display = 'block';
+    closeModal.onclick = () => modal.style.display = 'none';
+    window.onclick = e => { if (e.target === modal) modal.style.display = 'none'; };
+
+    // Prevent form reload
+    document.getElementById('search-form').addEventListener('submit', function (e) {
+      e.preventDefault();
+      SaavnSearch();
+    });
+  </script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.6.1/js/bootstrap.bundle.min.js"></script>
+  <script src="https://saavn-web-ui.vercel.app/assets/js/functions.js"></script>
+  <script src="https://saavn-web-ui.vercel.app/assets/js/saavn-search.js"></script>
+</body>
+
+</html>
+
+
+
